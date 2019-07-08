@@ -5,10 +5,11 @@ import com.jeecg.demo.entity.TSDocument;
 import org.jeecgframework.core.common.model.common.UploadFile;
 import org.jeecgframework.core.common.model.json.AjaxJson;
 import org.jeecgframework.core.common.model.json.DataGrid;
-import org.jeecgframework.core.util.DateUtils;
-import org.jeecgframework.core.util.MyClassLoader;
-import org.jeecgframework.core.util.StringUtil;
-import org.jeecgframework.core.util.oConvertUtils;
+import org.jeecgframework.core.util.*;
+import org.jeecgframework.minidao.pojo.MiniDaoPage;
+import org.jeecgframework.tag.core.easyui.TagUtil;
+import org.jeecgframework.web.system.dao.HelloMinidaoDao;
+import org.jeecgframework.web.system.entity.HelloEntity;
 import org.jeecgframework.web.system.pojo.base.TSType;
 import org.jeecgframework.web.system.pojo.base.TSTypegroup;
 import org.jeecgframework.web.system.service.SystemService;
@@ -89,16 +90,49 @@ public class HelloController {
         return mv;
     }
 
+    @Autowired
+    private HelloMinidaoDao helloMinidaoDao;
 
+
+    @RequestMapping(params = "page", method = RequestMethod.GET)
+    public ModelAndView page() {
+        ModelAndView mv = new ModelAndView("hello/page");
+        return mv;
+    }
     /**
      * minidao测试
-     * @param jeecgDemo 查询条件
+     *
+     * @param entity   查询条件
      * @param request
      * @param response
      * @param dataGrid datagruid控件参数
      */
     @RequestMapping(params = "minidaoDatagrid")
-    public void minidaoDatagrid(JeecgDemoEntity jeecgDemo, HttpServletRequest request, HttpServletResponse response, DataGrid dataGrid) {
+    public void minidaoDatagrid(HelloEntity entity, HttpServletRequest request, HttpServletResponse response, DataGrid dataGrid) {
+        /**
+         * 注意：minidao会遵循springjdbc规则，会自动把数据库以下划线的字段，转化为驼峰写法
+         * 例如数据库表字段：{user_name}
+         * 转化实体对应字段：{userName}
+         */
+
+        //step.1 获取数据权限SQL片段
+        //String authSql = JeecgDataAutorUtils.loadDataSearchConditonSQLString();
+
+        //设置排序字段
+        //step.2 将权限SQL片段注入到业务SQL中
+        MiniDaoPage<HelloEntity> list = helloMinidaoDao.page(entity, dataGrid.getPage(), dataGrid.getRows(), dataGrid.getSort(), dataGrid.getOrder());
+
+        dataGrid.setTotal(list.getTotal());
+        dataGrid.setResults(list.getResults());
+
+        //step.3 合计，格式为 字段名:值(可选，不写该值时为分页数据的合计) 多个合计 以 , 分割
+        /*String total_salary = String.valueOf(jeecgMinidaoDao.getSumSalary());
+        dataGrid.setFooter("salary:"+(total_salary.equalsIgnoreCase("null")?"0.0":total_salary)+",age,email:合计");
+        TagUtil.datagrid(response, dataGrid);*/
+
+        TagUtil.datagrid(response, dataGrid);
 
     }
+
+
 }
