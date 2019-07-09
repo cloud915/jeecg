@@ -1,17 +1,13 @@
 package org.jeecgframework.web.system.controller;
 
-import com.jeecg.demo.entity.JeecgDemoEntity;
-import com.jeecg.demo.entity.TSDocument;
-import org.jeecgframework.core.common.model.common.UploadFile;
-import org.jeecgframework.core.common.model.json.AjaxJson;
+import org.apache.commons.collections.CollectionUtils;
 import org.jeecgframework.core.common.model.json.DataGrid;
 import org.jeecgframework.core.util.*;
 import org.jeecgframework.minidao.pojo.MiniDaoPage;
 import org.jeecgframework.tag.core.easyui.TagUtil;
 import org.jeecgframework.web.system.dao.HelloMinidaoDao;
-import org.jeecgframework.web.system.entity.HelloEntity;
-import org.jeecgframework.web.system.pojo.base.TSType;
-import org.jeecgframework.web.system.pojo.base.TSTypegroup;
+import com.jeecg.demo.entity.HelloEntity;
+import com.jeecg.demo.service.HelloServiceI;
 import org.jeecgframework.web.system.service.SystemService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -23,13 +19,9 @@ import org.springframework.web.servlet.ModelAndView;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.io.File;
-import java.io.IOException;
+import java.io.*;
 import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Random;
+import java.util.*;
 
 /**
  * @Description
@@ -51,42 +43,45 @@ public class HelloController {
     }
 
     @RequestMapping(params = "index", method = RequestMethod.POST)
-    public ModelAndView index(MultipartHttpServletRequest request,
+    public ModelAndView index(HttpServletRequest httpRequest,
                               String path) {
 
         ModelAndView mv = new ModelAndView("hello/index");
 
-        //logger.info("后台上传文件");
-        //AjaxJson j = new AjaxJson();
-        String fileName = null;
-        String ctxPath = request.getSession().getServletContext().getRealPath(path);
-        File file = new File(ctxPath);
-        if (!file.exists()) {
-            file.mkdir();// 创建文件根目录
-        }
-        Map<String, MultipartFile> fileMap = request.getFileMap();
-        for (Map.Entry<String, MultipartFile> entity : fileMap.entrySet()) {
-            MultipartFile mf = entity.getValue();// 获取上传文件对象
-            fileName = mf.getOriginalFilename();// 获取文件名
-            String fileExt = fileName.substring(fileName.lastIndexOf(".") + 1).toLowerCase();
-            SimpleDateFormat df = new SimpleDateFormat("yyyyMMddHHmmss");
-            String newFileName = df.format(new Date()) + "_" + new Random().nextInt(1000) + "." + fileExt;
-            String savePath = file.getPath() + "/" + newFileName;// 上传后的文件绝对路径
-            System.out.println("上传后路径：" + savePath);
-            File savefile = new File(savePath);
-            try {
-                // String imageUrl = "http://" + request.getServerName() + ":" + request.getLocalPort() + request.getContextPath() + path + "/" + newFileName;
-                String imageUrl = request.getContextPath() + path + "/" + newFileName;
-                //logger.info("输出路径：" + imageUrl);
-                mf.transferTo(savefile);
-                //j.setObj(imageUrl);
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
-        //j.setMsg("上传成功");
-        //return j;
+        if (httpRequest instanceof MultipartHttpServletRequest) {
+            MultipartHttpServletRequest request = (MultipartHttpServletRequest) httpRequest;
 
+            //logger.info("后台上传文件");
+            //AjaxJson j = new AjaxJson();
+            String fileName = null;
+            String ctxPath = request.getSession().getServletContext().getRealPath(path);
+            File file = new File(ctxPath);
+            if (!file.exists()) {
+                file.mkdir();// 创建文件根目录
+            }
+            Map<String, MultipartFile> fileMap = request.getFileMap();
+            for (Map.Entry<String, MultipartFile> entity : fileMap.entrySet()) {
+                MultipartFile mf = entity.getValue();// 获取上传文件对象
+                fileName = mf.getOriginalFilename();// 获取文件名
+                String fileExt = fileName.substring(fileName.lastIndexOf(".") + 1).toLowerCase();
+                SimpleDateFormat df = new SimpleDateFormat("yyyyMMddHHmmss");
+                String newFileName = df.format(new Date()) + "_" + new Random().nextInt(1000) + "." + fileExt;
+                String savePath = file.getPath() + "/" + newFileName;// 上传后的文件绝对路径
+                System.out.println("上传后路径：" + savePath);
+                File savefile = new File(savePath);
+                try {
+                    // String imageUrl = "http://" + request.getServerName() + ":" + request.getLocalPort() + request.getContextPath() + path + "/" + newFileName;
+                    String imageUrl = request.getContextPath() + path + "/" + newFileName;
+                    //logger.info("输出路径：" + imageUrl);
+                    mf.transferTo(savefile);
+                    //j.setObj(imageUrl);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+            //j.setMsg("上传成功");
+            //return j;
+        }
         return mv;
     }
 
@@ -99,6 +94,7 @@ public class HelloController {
         ModelAndView mv = new ModelAndView("hello/page");
         return mv;
     }
+
     /**
      * minidao测试
      *
@@ -135,4 +131,80 @@ public class HelloController {
     }
 
 
+    @Autowired
+    private HelloServiceI helloService;
+
+    @RequestMapping(params = "plupload", method = RequestMethod.GET)
+    public ModelAndView plupload(HttpServletRequest request, Long id) {
+        ModelAndView mv = new ModelAndView("hello/plupload");
+        if (id != null) {
+            List<HelloEntity> list = helloService.findByProperty(HelloEntity.class, "id", id);
+
+            if (CollectionUtils.isNotEmpty(list)) {
+                request.setAttribute("entity", list.get(0));
+            }
+        }
+        return mv;
+    }
+
+
+    @RequestMapping(params = "plupload", method = RequestMethod.POST)
+    public ModelAndView plupload(HttpServletRequest request) throws Exception {
+        ModelAndView mv = new ModelAndView("hello/plupload");
+
+        String name = request.getParameter("name");
+        String[] paths = request.getParameterValues("pic[]");
+        HelloEntity entity = new HelloEntity();
+        entity.setCreateDate(new Date());
+        entity.setCreateBy("g");
+        entity.setSysCompanyCode(name);
+        if (paths != null && paths.length > 0) {
+            entity.setTupianPath(paths[0]);
+
+            String ctxPath = ResourceUtil.getConfigByName("webUploadpath");//demo中设置为D://upFiles,实际项目应因事制宜
+            String filePath = ctxPath + File.separator + paths[0];
+
+            File file = new File(filePath);
+            if (file.exists()) {
+                byte[] imgContent = new byte[(int) file.length()];
+                try (InputStream in = new FileInputStream(file)) {
+                    in.read(imgContent);
+
+                    entity.setTupian(imgContent);
+                } catch (FileNotFoundException e) {
+                    e.printStackTrace();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+
+        Serializable ser = helloService.save(entity);
+
+
+        return mv;
+    }
+
+
+
+    @RequestMapping(params = "webupload", method = RequestMethod.GET)
+    public ModelAndView webupload(HttpServletRequest request, Long id) {
+        ModelAndView mv = new ModelAndView("hello/webupload");
+        if (id != null) {
+            List<HelloEntity> list = helloService.findByProperty(HelloEntity.class, "id", id);
+
+            if (CollectionUtils.isNotEmpty(list)) {
+                request.setAttribute("entity", list.get(0));
+            }
+        }
+        return mv;
+    }
+
+
+    @RequestMapping(params = "webupload", method = RequestMethod.POST)
+    public ModelAndView webupload(HttpServletRequest request) {
+        ModelAndView mv = new ModelAndView("hello/webupload");
+
+        return mv;
+    }
 }

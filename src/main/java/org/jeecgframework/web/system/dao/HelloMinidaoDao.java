@@ -3,8 +3,9 @@ package org.jeecgframework.web.system.dao;
 import org.jeecgframework.minidao.annotation.MiniDao;
 import org.jeecgframework.minidao.annotation.Param;
 import org.jeecgframework.minidao.annotation.ResultType;
+import org.jeecgframework.minidao.annotation.Sql;
 import org.jeecgframework.minidao.pojo.MiniDaoPage;
-import org.jeecgframework.web.system.entity.HelloEntity;
+import com.jeecg.demo.entity.HelloEntity;
 
 
 /**
@@ -20,5 +21,6 @@ public interface HelloMinidaoDao {
                                   @Param("page") int page, @Param("rows") int rows,
                                   @Param("sort") String sort, @Param("order") String order);
 
-
+    @Sql("select * from NewTable where id=:id")
+    int queryByPrimaryId(@Param("id") long id);
 }

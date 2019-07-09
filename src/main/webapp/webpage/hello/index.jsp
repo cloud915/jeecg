@@ -37,9 +37,19 @@
             </td>
 
         </tr>
-        <%--<tr>
-            <td colspan="3"><input type="submit" value="submit" class="btn-blue btn-S"/></td>
-        </tr>--%>
+        <tr>
+            <td align="right">
+                <label class="Validform_label">
+                    图片:
+                </label>
+            </td>
+            <td class="value">
+                <t:webUploader displayTxt="false" bizType="photosucai" name="touxiang" auto="true" type="image"></t:webUploader>
+            </td>
+        </tr>
+        <tr>
+            <td colspan="2"><input type="submit" value="submit" class="btn-blue btn-S"/></td>
+        </tr>
     </table>
 
 </t:formvalid>

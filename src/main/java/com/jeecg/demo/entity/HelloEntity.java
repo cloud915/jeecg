@@ -1,4 +1,4 @@
-package org.jeecgframework.web.system.entity;
+package com.jeecg.demo.entity;
 
 import org.codehaus.jackson.map.annotate.JsonDeserialize;
 import org.hibernate.annotations.GenericGenerator;
@@ -23,7 +23,7 @@ public class HelloEntity implements java.io.Serializable {
         return this.sysCompanyCode;
     }
 
-    private java.lang.String id;
+    private Long id;
     /**
      * createDate
      */
@@ -55,29 +55,34 @@ public class HelloEntity implements java.io.Serializable {
      * 公司
      */
     private java.lang.String sysCompanyCode;
+    private java.lang.String tupianPath;
+    private byte[] tupian;
 
 
     @Id
-    @GeneratedValue(generator = "paymentableGenerator")
-    @GenericGenerator(name = "paymentableGenerator", strategy = "uuid")
+    //@GeneratedValue(generator = "paymentableGenerator")
+    //@GenericGenerator(name = "paymentableGenerator", strategy = "Integer")
+    @GeneratedValue(strategy = GenerationType.AUTO)
     @Column(name = "ID", nullable = false, length = 32)
-    public String getId() {
+    public Long getId() {
         return id;
     }
 
-    public void setId(String id) {
+    public void setId(Long id) {
         this.id = id;
     }
-    @Column(name ="CREATE_DATE",nullable=true)
+
+    @Column(name = "CREATE_DATE", nullable = true)
     public Date getCreateDate() {
         return createDate;
     }
+
     @JsonDeserialize(using = CustomJsonDateDeserializer.class)
     public void setCreateDate(Date createDate) {
         this.createDate = createDate;
     }
 
-    @Column(name ="CREATE_BY",nullable=true,length=32)
+    @Column(name = "CREATE_BY", nullable = true, length = 32)
     public String getCreateBy() {
         return createBy;
     }
@@ -86,7 +91,7 @@ public class HelloEntity implements java.io.Serializable {
         this.createBy = createBy;
     }
 
-    @Column(name ="CREATE_NAME",nullable=true,length=32)
+    @Column(name = "CREATE_NAME", nullable = true, length = 32)
     public String getCreateName() {
         return createName;
     }
@@ -95,7 +100,7 @@ public class HelloEntity implements java.io.Serializable {
         this.createName = createName;
     }
 
-    @Column(name ="UPDATE_BY",nullable=true,length=32)
+    @Column(name = "UPDATE_BY", nullable = true, length = 32)
     public String getUpdateBy() {
         return updateBy;
     }
@@ -104,7 +109,7 @@ public class HelloEntity implements java.io.Serializable {
         this.updateBy = updateBy;
     }
 
-    @Column(name ="UPDATE_DATE",nullable=true)
+    @Column(name = "UPDATE_DATE", nullable = true)
     public Date getUpdateDate() {
         return updateDate;
     }
@@ -113,7 +118,7 @@ public class HelloEntity implements java.io.Serializable {
         this.updateDate = updateDate;
     }
 
-    @Column(name ="UPDATE_NAME",nullable=true,length=32)
+    @Column(name = "UPDATE_NAME", nullable = true, length = 32)
     public String getUpdateName() {
         return updateName;
     }
@@ -138,5 +143,23 @@ public class HelloEntity implements java.io.Serializable {
 
     public void setSysCompanyCode(String sysCompanyCode) {
         this.sysCompanyCode = sysCompanyCode;
+    }
+
+    @Column(name = "tupianPath", nullable = true, length = 128)
+    public String getTupianPath() {
+        return tupianPath;
+    }
+
+    public void setTupianPath(String tupianPath) {
+        this.tupianPath = tupianPath;
+    }
+
+    @Column(name = "tupian", nullable = true)
+    public byte[] getTupian() {
+        return tupian;
+    }
+
+    public void setTupian(byte[] tupian) {
+        this.tupian = tupian;
     }
 }
