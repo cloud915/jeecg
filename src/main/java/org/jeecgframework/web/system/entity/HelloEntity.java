@@ -18,6 +18,11 @@ import java.util.Date;
 @SuppressWarnings("serial")
 public class HelloEntity implements java.io.Serializable {
 
+    @Override
+    public String toString() {
+        return this.sysCompanyCode;
+    }
+
     private java.lang.String id;
     /**
      * createDate

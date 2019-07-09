@@ -518,7 +518,7 @@ public class JeecgListDemoController extends BaseController {
 		StringBuffer sb = new StringBuffer();
 		sb.append("SELECT broswer as className ,count(broswer)  FROM TSLog group by broswer");
 		List userBroswerList = systemService.findByQueryString(sb.toString());
-		Long count = systemService.getCountForJdbc("SELECT COUNT(1) FROM T_S_Log WHERE 1=1");
+		Long count = systemService.getCountForJdbc("SELECT COUNT(1) FROM t_s_log WHERE 1=1");
 		List lt = new ArrayList();
 		hc = new Highchart();
 		hc.setName(mutiLangService.getLang(BROSWER_COUNT_ANALYSIS));
