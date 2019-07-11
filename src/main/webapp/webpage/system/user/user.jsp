@@ -5,6 +5,8 @@
 <head>
 <title>用户信息</title>
 <t:base type="jquery,easyui,tools"></t:base>
+	<link rel="stylesheet" type="text/css" href="plug-in/zoomify/css/zoomify.min.css"></link>
+	<script type="text/javascript" src="plug-in/zoomify/js/zoomify.min.js"></script>
 <script>
 	/**
 	 * 选择组织机构
@@ -61,6 +63,8 @@
 		}
 		$(function(){
 			$("#departname").prev().hide();
+
+			//$("div[id=div1] img").zoomify();
 		});
     </script>
 </head>
@@ -156,6 +160,15 @@
                 <span class="Validform_checktip"></span>
             </td>
         </tr>
+		<%--<tr>
+			<td></td>
+			<td>
+				<div id="div1">
+					<img src="https://ss2.bdstatic.com/70cFvnSh_Q1YnxGkpoWK1HF6hhy/it/u=2622480599,1232679963&fm=26&gp=0.jpg" id="img1" />
+				</div>
+			</td>
+		</tr>--%>
 	</table>
 </t:formvalid>
+
 </body>
